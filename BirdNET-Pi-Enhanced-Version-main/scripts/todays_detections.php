@@ -1,0 +1,567 @@
+<?php
+
+/* Prevent XSS input */
+$_GET   = filter_input_array(INPUT_GET, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: [];
+$_POST  = filter_input_array(INPUT_POST, FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?: [];
+
+ini_set('session.gc_maxlifetime', 7200);
+session_set_cookie_params(7200);
+session_start();
+error_reporting(E_ERROR);
+ini_set('display_errors',1);
+require_once 'scripts/common.php';
+$home = get_home();
+$config = get_config();
+$site_name = get_sitename();
+set_timezone();
+
+if(isset($kiosk) && $kiosk == true) {
+    echo "<div style='margin-top:20px' class=\"centered\"><h1><a><img class=\"topimage\" src=\"images/bnp.png\"></a></h1></div>
+</div><div class=\"centered\"><h3>$site_name</h3></div><hr>";
+} else {
+  $kiosk = false;
+}
+
+$db = new SQLite3('./scripts/birds.db', SQLITE3_OPEN_READONLY);
+$db->busyTimeout(1000);
+
+$summary = get_summary();
+$totalcount = $summary['totalcount'];
+$todaycount = $summary['todaycount'];
+$hourcount = $summary['hourcount'];
+$todayspeciestally = $summary['speciestally'];
+$totalspeciestally = $summary['totalspeciestally'];
+
+if(isset($_GET['comname'])) {
+ $birdName = htmlspecialchars_decode($_GET['comname'], ENT_QUOTES);
+
+// Set default days to 30 if not provided
+$days = request_int($_GET, 'days', 30, 1, 3650);
+
+// Prepare a SQL statement to retrieve the detection data for the specified bird
+$stmt = $db->prepare('SELECT Date, COUNT(*) AS Detections FROM detections WHERE Com_Name = :com_name AND Date BETWEEN DATE("now", "-' . $days . ' days") AND DATE("now") GROUP BY Date');
+
+// Bind the bird name parameter to the SQL statement
+$stmt->bindValue(':com_name', $birdName);
+
+// Execute the SQL statement and get the result set
+$result = db_execute_safe($db, $stmt, 'today detections species chart');
+
+// Fetch the result set as an associative array
+$data = array();
+while ($row = db_fetch_assoc_safe($result)) {
+  $data[$row['Date']] = $row['Detections'];
+}
+
+// Create an array of all dates in the last 14 days
+$last14Days = array();
+for ($i = 0; $i < 31; $i++) {
+  $last14Days[] = date('Y-m-d', strtotime("-$i days"));
+}
+
+// Merge the data array with the last14Days array
+$data = array_merge(array_fill_keys($last14Days, 0), $data);
+
+// Sort the data by date in ascending order
+ksort($data);
+
+// Convert the data to an array of objects
+$data = array_map(function($date, $count) {
+  return array('date' => $date, 'count' => $count);
+}, array_keys($data), $data);
+
+// Close the database connection
+$db->close();
+
+// Return the data as JSON
+echo json_encode($data);
+die();
+
+}
+
+// from https://stackoverflow.com/questions/2690504/php-producing-relative-date-time-from-timestamps
+function relativeTime($ts)
+{
+    if(!ctype_digit($ts))
+        $ts = strtotime($ts);
+
+    $diff = time() - $ts;
+    if($diff == 0)
+        return 'now';
+    elseif($diff > 0)
+    {
+        $day_diff = floor($diff / 86400);
+        if($day_diff == 0)
+        {
+            if($diff < 60) return 'just now';
+            if($diff < 120) return '1 minute ago';
+            if($diff < 3600) return floor($diff / 60) . ' minutes ago';
+            if($diff < 7200) return '1 hour ago';
+            if($diff < 86400) return floor($diff / 3600) . ' hours ago';
+        }
+        if($day_diff == 1) return 'Yesterday';
+        if($day_diff < 7) return $day_diff . ' days ago';
+        if($day_diff < 31) return ceil($day_diff / 7) . ' weeks ago';
+        if($day_diff < 60) return 'last month';
+        return date('F Y', $ts);
+    }
+    else
+    {
+        $diff = abs($diff);
+        $day_diff = floor($diff / 86400);
+        if($day_diff == 0)
+        {
+            if($diff < 120) return 'in a minute';
+            if($diff < 3600) return 'in ' . floor($diff / 60) . ' minutes';
+            if($diff < 7200) return 'in an hour';
+            if($diff < 86400) return 'in ' . floor($diff / 3600) . ' hours';
+        }
+        if($day_diff == 1) return 'Tomorrow';
+        if($day_diff < 4) return date('l', $ts);
+        if($day_diff < 7 + (7 - date('w'))) return 'next week';
+        if(ceil($day_diff / 7) < 4) return 'in ' . ceil($day_diff / 7) . ' weeks';
+        if(date('n', $ts) == date('n') + 1) return 'next month';
+        return date('F Y', $ts);
+    }
+}
+
+
+if(isset($_GET['ajax_detections']) && $_GET['ajax_detections'] == "true"  ) {
+  $search_value = null;
+  if(isset($_GET['searchterm'])) {
+    if(strtolower(explode(" ", $_GET['searchterm'])[0]) == "not") {
+      $not = "NOT ";
+      $operator = "AND";
+      $_GET['searchterm'] =  str_replace("not ", "", $_GET['searchterm']);
+      $_GET['searchterm'] =  str_replace("NOT ", "", $_GET['searchterm']);
+    } else {
+      $not = "";
+      $operator = "OR";
+    }
+    $search_value = '%' . $_GET['searchterm'] . '%';
+    $searchquery = "AND (Com_name ".$not."LIKE :searchterm ".$operator." Sci_name ".$not."LIKE :searchterm ".$operator." Confidence ".$not."LIKE :searchterm ".$operator." File_Name ".$not."LIKE :searchterm ".$operator." Time ".$not."LIKE :searchterm)";
+  } else {
+    $searchquery = "";
+  }
+  if(isset($_GET['display_limit']) && is_numeric($_GET['display_limit'])){
+    $offset = max(0, intval($_GET['display_limit']) - 40);
+    $statement0 = $db->prepare('SELECT Date, Time, Com_Name, Sci_Name, Confidence, File_Name FROM detections WHERE Date == Date(\'now\', \'localtime\') '.$searchquery.' ORDER BY Time DESC LIMIT '.$offset.',40');
+  } else {
+    // legacy mode
+    if(isset($_GET['hard_limit']) && is_numeric($_GET['hard_limit'])) {
+      $hard_limit = request_int($_GET, 'hard_limit', 40, 1, 500);
+      $statement0 = $db->prepare('SELECT Date, Time, Com_Name, Sci_Name, Confidence, File_Name FROM detections WHERE Date == Date(\'now\', \'localtime\') '.$searchquery.' ORDER BY Time DESC LIMIT '.$hard_limit);
+    } else {
+      $statement0 = $db->prepare('SELECT Date, Time, Com_Name, Sci_Name, Confidence, File_Name FROM detections WHERE Date == Date(\'now\', \'localtime\') '.$searchquery.' ORDER BY Time DESC');
+    }
+    
+  }
+  ensure_db_ok($statement0);
+  if ($search_value !== null) {
+    $statement0->bindValue(':searchterm', $search_value, SQLITE3_TEXT);
+  }
+  $result0 = db_execute_safe($db, $statement0, 'today detections ajax list');
+
+  ?> <table>
+   <?php
+
+  if(!isset($_SESSION['images'])) {
+    $_SESSION['images'] = [];
+  }
+  $iterations = 0;
+  $image_provider = null;
+
+  while($todaytable = db_fetch_assoc_safe($result0))
+  {
+    $iterations++;
+
+    $comname = preg_replace('/ /', '_', $todaytable['Com_Name']);
+    $comnamegraph = str_replace("'", "\'", $todaytable['Com_Name']);
+    $comname = preg_replace('/\'/', '', $comname);
+    $filename = "/By_Date/".date('Y-m-d')."/".$comname."/".$todaytable['File_Name'];
+    $filename_formatted = $todaytable['Date']."/".$comname."/".$todaytable['File_Name'];
+    $sciname = preg_replace('/ /', '_', $todaytable['Sci_Name']);
+    $engname = get_com_en_name($todaytable['Sci_Name']);
+    $engname_url = str_replace("'", '', str_replace(' ', '_', $engname));
+
+    $info_url = get_info_url($todaytable['Sci_Name']);
+    $url = $info_url['URL'];
+    $url_title = $info_url['TITLE'];
+
+    if (!empty($config["IMAGE_PROVIDER"])) {
+      if ($image_provider === null) {
+        $flickr = new Flickr();
+        $wikipedia = new Wikipedia();
+        if ($config["IMAGE_PROVIDER"] === 'FLICKR') {
+          $image_provider = $flickr;
+          $fallback_provider = $wikipedia;
+        } else {
+          $image_provider = $wikipedia;
+          $fallback_provider = $flickr;
+        }
+        if ($image_provider->is_reset()) {
+          $_SESSION['images'] = [];
+        }
+      }
+
+      // if we already searched flickr for this species before, use the previous image rather than doing an unneccesary api call
+      $key = array_search($comname, array_column($_SESSION['images'], 0));
+      if ($key !== false) {
+        $image = $_SESSION['images'][$key];
+      } else {
+        $cached_image = $image_provider->get_image($todaytable['Sci_Name'], $fallback_provider);
+        if ($cached_image) {
+          array_push($_SESSION["images"], array($comname, $cached_image["image_url"], $cached_image["title"], $cached_image["photos_url"], $cached_image["author_url"], $cached_image["license_url"]));
+          $image = $_SESSION['images'][count($_SESSION['images']) - 1];
+        } else {
+          $image = false;
+        }
+      }
+    }
+  ?>
+        <?php if(isset($_GET['display_limit']) && is_numeric($_GET['display_limit'])){ ?>
+          <tr class="relative" id="<?php echo $iterations; ?>">
+          <td class="relative">
+            <img style='cursor:pointer;right:45px' src='images/delete.svg' onclick='deleteDetection(<?php echo js_arg($filename_formatted); ?>)' class="copyimage" width=25 title='Delete Detection'>
+            <a target="_blank" href="index.php?filename=<?php echo urlencode($todaytable['File_Name']); ?>"><img class="copyimage" title="Open in new tab" width=25 src="images/copy.png"></a>
+        
+            
+          <div class="centered_image_container">
+            <?php if(!empty($config["IMAGE_PROVIDER"]) && (isset($image[1]) && strlen($image[1]) > 0)) { ?>
+              <img onerror="this.style.display='none'" onclick='setModalText(<?php echo (int)$iterations; ?>, <?php echo js_arg($image[2]); ?>, <?php echo js_arg($image[3]); ?>, <?php echo js_arg($image[4]); ?>, <?php echo js_arg($image[1]); ?>, <?php echo js_arg($image[5]); ?>)' src="<?php echo h($image[1]); ?>" class="img1">
+            <?php } ?>
+
+            <?php echo h($todaytable['Time']);?><br>
+          <b><a class="a2" href="<?php echo h($url);?>" target="top"><?php echo h($todaytable['Com_Name']);?></a></b><br>
+          <i><?php echo h($todaytable['Sci_Name']);?></i>
+          <a href="<?php echo h($url);?>" target="_blank"><img style="cursor:pointer;float:unset;display:inline" title="<?php echo h($url_title);?>" src="images/info.png" width="20"></a>
+          <a href="<?php echo get_wikipedia_url($sciname);?>" target="_blank"><img style=";cursor:pointer;float:unset;display:inline" title="Wikipedia" src="images/wiki.png" width="20"></a>
+          <img style=";cursor:pointer;float:unset;display:inline" title="View species stats" onclick="generateMiniGraph(this, <?php echo js_arg($todaytable['Com_Name']); ?>)" width=20 src="images/chart.svg"><br>
+          <b>Confidence:</b> <?php echo round((float)round($todaytable['Confidence'],2) * 100 ) . '%';?><br></div><br>
+          <div class='custom-audio-player' data-audio-src="<?php echo h($filename); ?>" data-image-src="<?php echo h($filename.".png");?>"></div>
+          </td>
+        <?php } else { //legacy mode ?>
+          <tr class="relative" id="<?php echo $iterations; ?>">
+          <td><?php if($_GET['kiosk'] == true) { echo h(relativeTime(strtotime($todaytable['Time']))); } else {echo h($todaytable['Time']);}?><br></td>
+          <td id="recent_detection_middle_td">
+          <div>
+            <div>
+            <?php if(!empty($config["IMAGE_PROVIDER"]) && (isset($_GET['hard_limit']) || $_GET['kiosk'] == true) && (isset($image[1]) && strlen($image[1]) > 0)) { ?>
+              <img onerror="this.style.display='none'" style="float:left;height:75px;" onclick='setModalText(<?php echo (int)$iterations; ?>, <?php echo js_arg($image[2]); ?>, <?php echo js_arg($image[3]); ?>, <?php echo js_arg($image[4]); ?>, <?php echo js_arg($image[1]); ?>, <?php echo js_arg($image[5]); ?>)' src="<?php echo h($image[1]); ?>" id="birdimage" class="img1">
+            <?php } ?>
+          </div>
+            <div>
+            <form action="" method="GET">
+                    <input type="hidden" name="view" value="Species Stats">
+          <button class="a2" type="submit" name="species" value="<?php echo h($todaytable['Com_Name']);?>"><?php echo h($todaytable['Com_Name']);?></button>
+	            <br><i>
+          <?php echo h($todaytable['Sci_Name']);?>
+	                <br>
+	                    <a href="<?php echo h($url);?>" target="_blank"><img style="height: 1em;cursor:pointer;float:unset;display:inline" title="<?php echo h($url_title);?>" src="images/info.png" width="25"></a>
+      	    <?php if($_GET['kiosk'] == false){?>
+	              <a href="<?php echo get_wikipedia_url($sciname);?>" target="_blank"><img style="height: 1em;cursor:pointer;float:unset;display:inline" title="Wikipedia" src="images/wiki.png" width="25"></a>
+	                    <img style="height: 1em;cursor:pointer;float:unset;display:inline" title="View species stats" onclick="generateMiniGraph(this, <?php echo js_arg($todaytable['Com_Name']); ?>)" width=25 src="images/chart.svg">
+	                    <a target="_blank" href="index.php?filename=<?php echo urlencode($todaytable['File_Name']); ?>"><img style="height: 1em;cursor:pointer;float:unset;display:inline" class="copyimage-mobile" title="Open in new tab" width=16 src="images/copy.png"></a>
+          	    <?php } ?></i>
+	                <br>
+	            </div>
+            </form>
+          </div>
+          </td>
+          <td><?php if(!isset($_GET['mobile'])) { echo '<b>Confidence:</b>';} echo round((float)round($todaytable['Confidence'],2) * 100 ) . '%';?><br></td>
+          <?php if(!isset($_GET['mobile'])) { ?>
+              <td style="min-width:180px"><audio controls preload="none" src="<?php echo h($filename);?>"></audio></td>
+          <?php } ?>
+        <?php } ?>
+  <?php }?>
+        </tr>
+      </table>
+
+  <?php 
+  if($iterations == 0) {
+    echo "<h3>No Detections For Today.</h3>";
+  }
+  
+  // don't show the button if there's no more detections to be displayed, we're at the end of the list
+  if($iterations >= 40 && isset($_GET['display_limit']) && is_numeric($_GET['display_limit'])) { ?>
+  <center>
+  <button class="loadmore" onclick="loadDetections(<?php echo $_GET['display_limit'] + 40; ?>, this);" value="Today's Detections">Load 40 More...</button>
+  </center>
+  <?php }
+
+  die();
+}
+
+if(isset($_GET['today_stats'])) {
+  ?>
+  <table>
+      <tr>
+  <th>Total</th>
+  <th>Today</th>
+  <th>Last Hour</th>
+  <th>Species Total</th>
+  <th>Species Today</th>
+      </tr>
+      <tr><td><?php echo $totalcount;?></td>
+	      <td><form action="" method="GET"><input type="hidden" name="view" value="Recordings">
+            <?php if($kiosk == false){?><button type="submit" name="date" value="<?php echo date('Y-m-d');?>"><?php echo $todaycount;?></button>
+            <?php } else { echo $todaycount; } ?>
+          </form></td>
+        <td><?php echo $hourcount;?></td>
+        <td><form action="" method="GET">
+            <?php if($kiosk == false){?><button type="submit" name="view" value="Species Stats"><?php echo $totalspeciestally;?></button>
+            <?php } else { echo $totalspeciestally; } ?>
+          </form></td>
+        <td><form action="" method="GET">
+            <input type="hidden" name="view" value="Recordings">
+            <?php if($kiosk == false){?><button type="submit" name="date" value="<?php echo date('Y-m-d');?>"><?php echo $todayspeciestally;?></button>
+            <?php } else { echo $todayspeciestally; } ?>
+          </form></td>
+      </tr>
+    </table>
+<?php   
+die(); 
+}
+
+if (get_included_files()[0] === __FILE__) {
+  echo '<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BirdNET-Pi DB</title>
+</head>';
+}
+?>
+<div class="viewdb">
+  <dialog style="margin-top: 5px;max-height: 95vh;
+  overflow-y: auto;overscroll-behavior:contain" id="attribution-dialog">
+    <h1 id="modalHeading"></h1>
+    <p id="modalText"></p>
+    <button style="font-weight:bold;color:blue" onclick="hideDialog()">Close</button>
+    <button style="font-weight:bold;color:blue" onclick="confirmBlacklistImage()" <?php if($config["IMAGE_PROVIDER"] === 'WIKIPEDIA'){ echo 'hidden';} ?> >Blacklist this image</button>
+  </dialog>
+  <script src="static/dialog-polyfill.js"></script>
+  <script src="static/Chart.bundle.js"></script>
+  <script src="static/chartjs-plugin-trendline.min.js"></script>
+  
+  <script>
+    function deleteDetection(filename,copylink=false) {
+    var runDelete = function() {
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function() {
+        if(this.responseText == "OK"){
+          if(copylink == true) {
+            window.top.close();
+          } else {
+            location.reload();
+          }
+        } else {
+          alert("Database busy.")
+        }
+      }
+      xhttp.open("GET", "play.php?deletefile="+encodeURIComponent(filename), true);
+      xhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+      xhttp.send();
+    };
+
+    if (window.BirdNETUI) {
+      BirdNETUI.confirmAction({
+        title: 'Delete detection',
+        message: 'This removes the detection from the database.',
+        confirmText: 'Delete',
+        danger: true
+      }).then(function(confirmed) {
+        if (confirmed) {
+          runDelete();
+        }
+      });
+      return;
+    }
+    if (confirm("Are you sure you want to delete this detection from the database?") == true) {
+      runDelete();
+    }
+  }
+
+    var last_photo_link;
+  var dialog = document.querySelector('dialog');
+  dialogPolyfill.registerDialog(dialog);
+
+  function showDialog() {
+    document.getElementById('attribution-dialog').showModal();
+  }
+
+  function hideDialog() {
+    document.getElementById('attribution-dialog').close();
+  }
+
+  function confirmBlacklistImage() {
+    if (window.BirdNETUI) {
+      BirdNETUI.confirmAction({
+        title: 'Blacklist image',
+        message: 'This prevents the current image from being used again for this species.',
+        confirmText: 'Blacklist image',
+        danger: true
+      }).then(function(confirmed) {
+        if (confirmed) {
+          blacklistImage();
+        }
+      });
+      return;
+    }
+    if (confirm('Are you sure you want to blacklist this image?')) {
+      blacklistImage();
+    }
+  }
+
+  function blacklistImage() {
+    const match = last_photo_link.match(/\d+$/); // match one or more digits
+    const result = match ? match[0] : null; // extract the first match or return null if no match is found
+    console.log(last_photo_link)
+    const xhttp = new XMLHttpRequest();
+    xhttp.onload = function() {
+      if(this.responseText.length > 0) {
+       location.reload();
+      }
+    }
+    xhttp.open("GET", "overview.php?blacklistimage="+result, true);
+    xhttp.send();
+
+  }
+
+  function shorten(u) {
+    if (u.length < 48) {
+      return u;
+    }
+    uend = u.slice(u.length - 16);
+    ustart = u.substr(0, 32);
+    var shorter = ustart + '...' + uend;
+    return shorter;
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function(ch) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[ch];
+    });
+  }
+
+  function safeHttpUrl(url) {
+    try {
+      const parsed = new URL(String(url), window.location.origin);
+      return (parsed.protocol === 'http:' || parsed.protocol === 'https:') ? parsed.href : '#';
+    } catch (e) {
+      return '#';
+    }
+  }
+
+  function setModalText(iter, title, text, authorlink, photolink, licenseurl) {
+    const safeText = safeHttpUrl(text);
+    const safeAuthor = safeHttpUrl(authorlink);
+    const safePhoto = safeHttpUrl(photolink);
+    const safeLicense = safeHttpUrl(licenseurl);
+    let text_display = shorten(safeText);
+    let authorlink_display = shorten(safeAuthor);
+    let licenseurl_display = shorten(safeLicense);
+    document.getElementById('modalHeading').textContent = "Photo: \""+String(title)+"\" Attribution";
+    document.getElementById('modalText').innerHTML = "<div><img style='border-radius:5px;max-height: calc(100vh - 15rem);display: block;margin: 0 auto;' src='"+escapeHtml(safePhoto)+"'></div><br><div style='white-space:nowrap'>Image link: <a target='_blank' href='"+escapeHtml(safeText)+"'>"+escapeHtml(text_display)+"</a><br>Author link: <a target='_blank' href='"+escapeHtml(safeAuthor)+"'>"+escapeHtml(authorlink_display)+"</a><br>License URL: <a href='"+escapeHtml(safeLicense)+"' target='_blank'>"+escapeHtml(licenseurl_display)+"</a></div>";
+    last_photo_link = safeText;
+    showDialog();
+  }
+  </script>  
+    <h3>Number of Detections</h3>
+    <div id="todaystats" class="overview"><form action="views.php" method="GET"><table>
+      <tr>
+  <th>Total</th>
+  <th>Today</th>
+  <th>Last Hour</th>
+  <th>Species Total</th>
+  <th>Species Today</th>
+      </tr>
+      <tr>
+      <td><?php echo $totalcount;?></td>
+      <td><input type="hidden" name="view" value="Recordings"><?php if($kiosk == false){?><button type="submit" name="date" value="<?php echo date('Y-m-d');?>"><?php echo $todaycount;?></button><?php } else { echo $todaycount; }?></td>
+      <td><?php echo $hourcount;?></td>
+      <td><?php if($kiosk == false){?><button type="submit" name="view" value="Species Stats"><?php echo $totalspeciestally;?></button><?php }else { echo $totalspeciestally; }?></td>
+      <td><input type="hidden" name="view" value="Recordings"><?php if($kiosk == false){?><button type="submit" name="date" value="<?php echo date('Y-m-d');?>"><?php echo $todayspeciestally;?></button><?php } else { echo $todayspeciestally; }?></td>
+      </tr>
+    </table></form></div>
+
+
+    <h3>Today's Detections</h3>
+
+    <div style="padding-bottom:10px;" id="timeline_container"></div>
+
+</div>
+<script src="static/timeline-view.js?v=<?php echo (int)@filemtime('static/timeline-view.js'); ?>"></script>
+<?php if($kiosk == true) { ?>
+  <script>
+    const scrollToTop = () => {
+  const c = document.documentElement.scrollTop || document.body.scrollTop;
+  if (c > 0) {
+    window.requestAnimationFrame(scrollToTop);
+    window.scrollTo(0, c - c / 8);
+  }
+};
+</script>
+<button onclick="scrollToTop();" style="background-color: #dbffeb;padding: 20px;position: fixed;bottom: 5%;right: 5%;transition:box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);">Scroll To Top</button>
+<?php } ?>
+
+<script>
+
+function refreshTodayStats() {
+  const xhttp = new XMLHttpRequest();
+  xhttp.onload = function() {
+    if(this.responseText.length > 0 && !this.responseText.includes("Database is busy")) {
+      document.getElementById("todaystats").innerHTML = this.responseText;
+    }
+  }
+  xhttp.open("GET", "todays_detections.php?today_stats=true", true);
+  xhttp.send();
+}
+
+window.addEventListener("load", function(){
+  <?php if($kiosk == true) { ?>
+    document.getElementById("myTopnav").remove();
+  <?php } ?>
+
+  if(!TimelineView.data) {
+    TimelineView.init("timeline_container", "<?php echo $config['LATITUDE'];?>", "<?php echo $config['LONGITUDE'];?>");
+  }
+
+  <?php if($kiosk == true) { ?>
+    refreshTodayStats();
+    // refresh the kiosk detection list every minute
+    setInterval(function() {
+        TimelineView.fetchData();
+        refreshTodayStats();
+    }, 60000);
+  <?php } ?>
+});
+</script>
+
+<style>
+  .tooltip {
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  transition: opacity 0.2s ease-in-out;
+}
+</style>
+
+<script src="static/custom-audio-player.js"></script>
+<script src="static/generateMiniGraph.js"></script>
+<script>
+// Listen for the scroll event on the window object
+window.addEventListener('scroll', function() {
+  // Get all chart elements
+  var charts = document.querySelectorAll('.chartdiv');
+  
+  // Loop through all chart elements and remove them
+  charts.forEach(function(chart) {
+    chart.parentNode.removeChild(chart);
+    window.chartWindow = undefined;
+  });
+});
+
+</script>

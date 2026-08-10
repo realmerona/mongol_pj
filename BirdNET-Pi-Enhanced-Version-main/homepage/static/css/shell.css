@@ -1,0 +1,524 @@
+/* ============================================================
+   App shell styles (Phase 0)
+   Extracted from inline <style> blocks in views.php:
+   floating live-audio panel + sidebar live-activity feed.
+   ============================================================ */
+
+/* ===== Floating live audio panel ===== */
+#live-audio-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 999999;
+  display: flex;
+  align-items: flex-start;
+  pointer-events: none; /* Let clicks pass through when hidden */
+}
+
+#live-audio-panel.open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+#live-audio-tab {
+  position: absolute;
+  left: -65px;
+  width: 65px;
+  height: 30px;
+  top: 0;
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #ccc);
+  border-top: none;
+  border-right: none;
+  border-radius: 0 0 0 8px;
+  box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: var(--text-primary, #333);
+  user-select: none;
+  pointer-events: auto; /* Tab always clickable */
+  padding: 0;
+}
+
+#live-audio-tab:hover {
+  background: var(--bg-button-hover, #f1f5f9);
+}
+
+#live-audio-content {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border, #ccc);
+  border-top: none;
+  border-right: none;
+  border-radius: 0 0 0 8px;
+  box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 2px 10px;
+  display: flex;
+  align-items: center;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+#live-audio-panel.open #live-audio-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+#live-audio-player {
+  height: 36px;
+  outline: none;
+}
+
+@media (max-width: 1000px) {
+  #live-audio-panel {
+    top: 56px; /* Offset to sit directly below the mobile header */
+  }
+
+  #live-audio-tab {
+    border-top: 1px solid var(--border, #ccc);
+    border-radius: 8px 0 0 8px;
+  }
+}
+
+/* ===== Theme toggle (CSS-driven, no load flash) =====
+   Both states exist in the markup; data-theme (set in <head> before paint)
+   decides which is visible, so the correct icon shows from the first frame. */
+.theme-toggle-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-theme="dark"] .theme-when-light {
+  display: none !important;
+}
+
+html:not([data-theme="dark"]) .theme-when-dark {
+  display: none !important;
+}
+
+/* In the collapsed sidebar, keep the emoji visible but hide the label
+   (the generic collapsed rule hides all button spans, wrappers included) */
+.sidebar.collapsed .sidebar-nav button span.theme-toggle-option {
+  display: inline-flex;
+}
+
+.sidebar.collapsed .sidebar-nav button .theme-toggle-option span {
+  display: none;
+}
+
+/* ===== Palette launch buttons ===== */
+.palette-launch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 16px 0;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.8em;
+  cursor: pointer;
+  text-align: left;
+}
+
+.palette-launch:hover {
+  background: var(--bg-button-hover, #e2e8f0);
+  color: var(--text-primary);
+}
+
+.palette-launch span {
+  flex: 1;
+}
+
+.palette-launch kbd {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 5px;
+  font-size: 0.85em;
+  font-family: inherit;
+  color: var(--text-muted);
+}
+
+.palette-launch .nav-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.sidebar.collapsed .palette-launch span,
+.sidebar.collapsed .palette-launch kbd {
+  display: none;
+}
+
+.sidebar.collapsed .palette-launch {
+  justify-content: center;
+  margin: 8px 10px 0;
+  padding: 7px 0;
+}
+
+/* Sits beside the hamburger (margin-left:auto absorbs the header's
+   space-between gap) and reads as a real button */
+.palette-launch-mobile {
+  margin-left: auto;
+  margin-right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.palette-launch-mobile:hover {
+  background: var(--bg-button-hover, #e2e8f0);
+}
+
+.palette-launch-mobile .nav-icon {
+  width: 19px;
+  height: 19px;
+}
+
+/* ===== Command palette (Ctrl+K) ===== */
+.palette-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  z-index: 1000000;
+  padding: 12vh 16px 0;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.palette-overlay.open {
+  display: flex;
+}
+
+.palette-box {
+  width: 100%;
+  max-width: 540px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.palette-box input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
+  font: inherit;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.palette-box ul {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.palette-box li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.palette-box li:hover {
+  background: var(--bg-button-hover);
+}
+
+.palette-box li.selected {
+  background: var(--accent-subtle, rgba(79, 70, 229, 0.08));
+  color: var(--accent);
+}
+
+.palette-kind {
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.palette-label em {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.85em;
+}
+
+.palette-empty {
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.palette-hint {
+  border-top: 1px solid var(--border-light);
+  padding: 7px 12px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.palette-hint kbd {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 5px;
+}
+
+/* ===== Bottom mobile tab bar ===== */
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+    z-index: 998;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .bottom-nav a,
+  .bottom-nav button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 0 6px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .bottom-nav a:hover,
+  .bottom-nav button:hover {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .bottom-nav a.active {
+    color: var(--accent);
+  }
+
+  .bottom-nav .nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* keep page content clear of the bar */
+  .views {
+    padding-bottom: 76px;
+  }
+}
+
+/* ===== Sidebar live activity feed ===== */
+.sidebar-feed {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.sidebar-feed h3 {
+  margin: 0 0 10px 0;
+  font-size: 0.9em;
+  color: var(--text-heading);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-feed h3 .live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--live-dot, #22c55e);
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.feed-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex-grow: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.feed-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.feed-list::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 4px;
+}
+
+.feed-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light, #f1f5f9);
+  font-size: 0.8em;
+}
+
+.feed-item:last-child {
+  border-bottom: none;
+}
+
+.feed-species {
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-badge {
+  display: inline-block;
+  padding: 2px 5px;
+  border-radius: 8px;
+  font-size: 0.7em;
+  font-weight: 700;
+  margin: 0 6px;
+  min-width: 32px;
+  text-align: center;
+}
+
+.feed-badge.high {
+  background: var(--conf-high-bg);
+  color: var(--conf-high-text);
+}
+
+.feed-badge.med {
+  background: var(--conf-med-bg);
+  color: var(--conf-med-text);
+}
+
+.feed-badge.low {
+  background: var(--conf-low-bg);
+  color: var(--conf-low-text);
+}
+
+.feed-time {
+  font-size: 0.75em;
+  color: var(--text-secondary, #6b7280);
+  white-space: nowrap;
+}
+
+.feed-count {
+  color: var(--text-secondary, #6b7280);
+  font-weight: 400;
+  font-size: 0.75em;
+  flex-shrink: 0; /* the count survives even when a long name truncates */
+  margin-left: 2px;
+}
+
+.feed-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--success, #10b981);
+  font-weight: 700;
+  font-size: 0.95em;
+}
+
+.feed-now .live-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--success, #10b981);
+  border-radius: 50%;
+  animation: pulse-dot 2s infinite;
+}
+
+.feed-item.feed-active .feed-species {
+  color: var(--text-heading);
+}
+
+/* Optional station label under the sidebar logo (Settings > Display & Units) */
+.sidebar-logo {
+  flex-wrap: wrap;
+}
+
+.sidebar-site-name {
+  flex-basis: 100%;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-site-name {
+  display: none;
+}
+
+/* Owner-authored info box at the top of the Today page */
+.custom-info-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+  overflow-wrap: break-word;
+}
+
+.custom-info-box img {
+  max-width: 100%;
+}

@@ -1,0 +1,97 @@
+/* ============================================================
+   BirdNET-Pi design tokens + accessibility baseline (Phase 0)
+   Loaded after style.css / dark-style.css; adds NEW variables
+   and utilities only — it does not override theme colors.
+   ============================================================ */
+
+:root {
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.85rem;
+  --text-base: 1rem;
+  --text-lg: 1.2rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.8rem;
+
+  /* Confidence badge semantics (replaces hardcoded hexes) */
+  --conf-high-bg: #dcfce7;
+  --conf-high-text: #166534;
+  --conf-med-bg: #fef9c3;
+  --conf-med-text: #854d0e;
+  --conf-low-bg: #fee2e2;
+  --conf-low-text: #991b1b;
+
+  /* Live indicator */
+  --live-dot: #22c55e;
+}
+
+[data-theme="dark"] {
+  --conf-high-bg: #14342a;
+  --conf-high-text: #4ade80;
+  --conf-med-bg: #3a2f14;
+  --conf-med-text: #facc15;
+  --conf-low-bg: #3b1a1a;
+  --conf-low-text: #f87171;
+}
+
+/* ===== Icon system (local SVG sprite, themed via currentColor) ===== */
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed .sidebar-nav .nav-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ===== Info badge (crisp text-based replacement for the U+24D8 glyph) ===== */
+.info-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  background: var(--accent-subtle, rgba(79, 70, 229, 0.08));
+  color: var(--accent, #4f46e5);
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 800;
+  font-style: normal;
+  cursor: help;
+  vertical-align: -2px;
+  user-select: none;
+}
+
+.info-badge:hover {
+  background: var(--accent, #4f46e5);
+  color: #fff;
+}
+
+/* ===== Accessibility baseline ===== */
+:focus-visible {
+  outline: 2px solid var(--accent, #4f46e5);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

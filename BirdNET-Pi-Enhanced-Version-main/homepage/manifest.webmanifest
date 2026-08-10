@@ -1,0 +1,25 @@
+{
+  "name": "BirdNET-Pi",
+  "short_name": "BirdNET-Pi",
+  "description": "Your backyard bird observatory - live acoustic bird identification",
+  "start_url": "/?view=Now",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/images/pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

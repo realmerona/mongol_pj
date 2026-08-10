@@ -1,0 +1,119 @@
+/* BirdNET-Pi Dark Theme */
+/* Import base styles, then override CSS custom properties */
+@import url('../style.css');
+
+:root {
+  --bg-primary: #0f1419;
+  --bg-secondary: #1a1f2e;
+  --bg-card: #1e2433;
+  --bg-nav: #0d1117;
+  --bg-banner: #161b22;
+  --bg-table-header: #151b28;
+  --bg-table-row: #1e2433;
+  --bg-table-row-alt: #232a3b;
+  --bg-button: #1e2433;
+  --bg-button-hover: #243044;
+
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  --text-on-dark: #c9d1d9;
+  --text-on-dark-muted: #8b949e;
+  --text-heading: #e6edf3;
+
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+  --accent-light: rgba(45, 212, 191, 0.1);
+  --accent-subtle: rgba(45, 212, 191, 0.06);
+
+  --border: #30363d;
+  --border-light: #21262d;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.35), 0 4px 6px rgba(0, 0, 0, 0.25);
+
+  --link: #2dd4bf;
+  --link-hover: #5eead4;
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+}
+
+/* ===== Dark-specific overrides ===== */
+/* These handle cases where the base styles use hardcoded colors
+   that don't go through CSS variables */
+
+.mobile-header .icon img {
+  filter: invert(1);
+}
+
+/* Banner dark overrides */
+.banner {
+  border-bottom-color: var(--border);
+}
+
+.topimage {
+  filter: brightness(0) invert(1) brightness(0.85);
+}
+
+.kpi-card-highlight {
+  background: linear-gradient(135deg, #2a2215 0%, #332a18 100%);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+.kpi-card-highlight .kpi-value {
+  color: #fbbf24;
+}
+
+.sortbutton {
+  color: #0f1419;
+}
+
+.sortbutton:hover,
+.sortbutton.active {
+  color: #0f1419;
+}
+
+.brbanner {
+  color: #0f1419;
+}
+
+input,
+textarea {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+select {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+dialog {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+pre.bash {
+  background-color: #0d1117;
+  color: var(--text-primary);
+}
+
+#showpassword,
+#newrtspstream {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.exclude_species_list_option_highlight {
+  color: var(--text-heading);
+  background-color: var(--accent-light);
+}
+
+.testbtn {
+  background: var(--bg-card) !important;
+  color: var(--text-primary);
+}

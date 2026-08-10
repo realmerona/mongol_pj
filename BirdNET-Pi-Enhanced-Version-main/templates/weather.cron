@@ -1,0 +1,2 @@
+#birdnet weather sync
+0 * * * * $USER /home/$USER/BirdNET-Pi/birdnet/bin/python3 /home/$USER/BirdNET-Pi/scripts/utils/weather.py >/dev/null 2>&1

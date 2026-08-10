@@ -1,0 +1,1361 @@
+/* ============================================================
+   Page styles for the Phase 2 views: Now, Live, Doctor, Review.
+   Generic .ui-card / .ui-button-link components live here until
+   promoted into the main design system.
+   ============================================================ */
+
+.ui-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light, #f1f5f9);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4, 16px);
+  text-align: left;
+}
+
+.ui-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  margin: 0 0 var(--space-3, 12px) 0;
+  font-size: 1.05em;
+}
+
+.ui-button-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 12px);
+  background: var(--bg-button, #fff);
+  color: var(--text-primary);
+  font-size: 0.9em;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ui-button-link:hover {
+  background: var(--bg-button-hover, #f1f5f9);
+  font-weight: normal;
+  color: var(--text-primary);
+}
+
+/* ===== Now page ===== */
+.now-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  text-align: left;
+}
+
+.now-story .story-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.now-story .story-lines li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.now-story .story-lines .nav-icon {
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.now-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-4, 16px);
+}
+
+.now-hero {
+  display: flex;
+  gap: var(--space-4, 16px);
+}
+
+.hero-photo {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+  border-radius: var(--radius, 12px);
+  overflow: hidden;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* contain (not cover) so the whole bird is always visible */
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hero-photo-placeholder .nav-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-muted);
+}
+
+.hero-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.hero-body h2 {
+  margin: 6px 0 2px 0;
+  font-size: var(--text-2xl, 1.8rem);
+  color: var(--text-heading);
+}
+
+.hero-sci {
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: var(--text-sm, 0.85rem);
+}
+
+.hero-meta {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm, 0.85rem);
+}
+
+.hero-badges {
+  margin-top: 10px;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+}
+
+.hero-badge.new { background: var(--conf-high-bg); color: var(--conf-high-text); }
+.hero-badge.rare { background: var(--accent-light, #e0e7ff); color: var(--accent, #4f46e5); }
+.hero-badge.regular { background: var(--bg-secondary); color: var(--text-secondary); font-weight: 600; }
+
+.hero-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.now-kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3, 12px);
+  align-content: start;
+}
+
+/* Label matching the hero's LAST HEARD kicker, so the totals read as their
+   own section (all species) rather than stats for the hero bird */
+.kpi-kicker {
+  grid-column: 1 / -1;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: -4px;
+}
+
+.kpi-mini {
+  padding: var(--space-3, 12px);
+  text-align: center;
+}
+
+.kpi-mini-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.kpi-mini-label {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary);
+}
+
+.kpi-lifetime {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-muted);
+}
+
+.visit-empty {
+  color: var(--text-secondary);
+  padding: 10px 0;
+  list-style: none;
+}
+
+.hero-active {
+  color: var(--success, #10b981);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.now-species-hint {
+  margin-left: auto;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* Grid / Heatmap segmented toggle */
+.view-toggle {
+  margin-left: 12px;
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.view-toggle button {
+  border: none;
+  background: var(--bg-button);
+  color: var(--text-secondary);
+  padding: 5px 14px;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.view-toggle button:hover {
+  background: var(--bg-button-hover);
+}
+
+.view-toggle button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Heatmap view: hosts the original Overview canvas renderer
+   (static/dashboard-charts.js draws into #hourlyHeatmap) */
+.heatmap-embed {
+  overflow-x: auto;
+}
+
+.species-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4, 16px);
+}
+
+.species-card-mini {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius, 12px);
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.species-card-photo {
+  height: 150px;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* contain (not cover) so the whole bird is always visible */
+.species-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.species-card-noimg {
+  font-size: 2em;
+  color: var(--text-muted);
+}
+
+.species-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 4px;
+}
+
+.species-card-name {
+  font-weight: 600;
+  font-size: var(--text-sm, 0.85rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+}
+
+a.species-card-name:hover {
+  color: var(--accent);
+  font-weight: 600; /* keep weight stable so the row doesn't shift */
+}
+
+a.species-card-photo:hover img {
+  opacity: 0.9;
+}
+
+.species-card-stats {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 30px;
+  padding: 0 10px;
+}
+
+.spark i {
+  flex: 1;
+  background: var(--border);
+  border-radius: 1px;
+}
+
+.spark i.on {
+  background: var(--accent);
+  opacity: 0.75;
+}
+
+.spark i.future {
+  opacity: 0.35;
+}
+
+/* Hour + weather axis under each card's bars (every 3 hours) */
+.spark-axis {
+  display: flex;
+  padding: 3px 10px 9px;
+}
+
+.axis-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.axis-time {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+
+.axis-weather {
+  font-size: 0.7rem;
+}
+
+.axis-temp {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+  .now-main {
+    grid-template-columns: 1fr;
+  }
+  .now-hero {
+    flex-direction: column;
+  }
+  .hero-photo {
+    width: 100%;
+    height: 160px;
+  }
+  .species-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Live page ===== */
+.live-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  text-align: left;
+}
+
+.live-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.live-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-heading);
+}
+
+.live-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.live-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-button);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.live-btn:hover { background: var(--bg-button-hover); }
+
+.live-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.live-nowhearing {
+  text-align: center;
+  padding: var(--space-5, 24px);
+}
+
+.live-nowhearing-label {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.live-nowhearing-species {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 6px 0 4px;
+}
+
+.live-nowhearing-meta {
+  color: var(--text-secondary);
+}
+
+.live-nowhearing.flash {
+  animation: live-flash 1.2s ease-out;
+}
+
+@keyframes live-flash {
+  0% { box-shadow: 0 0 0 3px var(--accent); }
+  100% { box-shadow: var(--shadow-sm); }
+}
+
+/* Embedded streaming spectrogram viewer (spectrogram.php) */
+.live-stream-embed {
+  padding: var(--space-3, 12px);
+  overflow: hidden;
+}
+
+.live-stream-embed canvas {
+  display: block;
+  width: 100%;
+  height: 440px;
+  background: #000;
+  border-radius: var(--radius, 12px);
+}
+
+.live-stream-embed #loading-h1 {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.live-stream-embed .centered {
+  padding: 6px 0;
+}
+
+.live-stream-embed audio#player {
+  width: 100%;
+  margin: 6px 0;
+}
+
+.live-page.kiosk .live-nowhearing-species { font-size: 3.2rem; }
+.live-page.kiosk { background: var(--bg-primary); padding: var(--space-5, 24px); max-width: none; }
+.live-page.kiosk .live-stream-embed canvas { height: 56vh; }
+
+/* ===== Doctor page ===== */
+.doctor-page, .review-page {
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.doctor-intro {
+  color: var(--text-secondary);
+  font-size: var(--text-sm, 0.85rem);
+  margin: 4px 0 16px;
+}
+
+.doctor-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: var(--space-4, 16px);
+}
+
+.doctor-check {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius, 12px);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--text-muted);
+}
+
+.doctor-check.ok { border-left-color: var(--success); }
+.doctor-check.warn { border-left-color: var(--warning); }
+.doctor-check.error { border-left-color: var(--danger); }
+
+.doctor-check-icon {
+  font-weight: 700;
+  width: 20px;
+  text-align: center;
+}
+
+.doctor-check.ok .doctor-check-icon { color: var(--success); }
+.doctor-check.warn .doctor-check-icon { color: var(--warning); }
+.doctor-check.error .doctor-check-icon { color: var(--danger); }
+
+.doctor-check-label {
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.doctor-check-message {
+  color: var(--text-primary);
+  font-size: var(--text-sm, 0.85rem);
+}
+
+.doctor-check-action {
+  color: var(--text-secondary);
+  font-size: var(--text-xs, 0.75rem);
+  margin-top: 2px;
+}
+
+.doctor-fix-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.doctor-output {
+  margin-top: 12px;
+  max-height: 320px;
+  overflow: auto;
+  background: var(--bg-secondary);
+  border-radius: var(--radius, 12px);
+  padding: 12px;
+  font-size: 0.8em;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+.doctor-output.error { border-left: 4px solid var(--danger); }
+
+/* ===== Review page ===== */
+.review-queue {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 12px);
+}
+
+.review-card {
+  display: flex;
+  gap: var(--space-4, 16px);
+}
+
+.review-card.reviewed {
+  opacity: 0.55;
+}
+
+.review-card-media {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.review-card-media img {
+  width: 100%;
+  border-radius: var(--radius, 12px);
+  background: var(--bg-secondary);
+}
+
+.review-card-media audio {
+  width: 100%;
+  height: 32px;
+}
+
+.review-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.review-card-title {
+  font-weight: 700;
+  color: var(--text-heading);
+  font-size: 1.05em;
+}
+
+.review-reason {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.review-reason.uncertain { background: var(--conf-med-bg); color: var(--conf-med-text); }
+.review-reason.first_lifetime { background: var(--conf-high-bg); color: var(--conf-high-text); }
+
+.review-card-meta {
+  color: var(--text-secondary);
+  font-size: var(--text-sm, 0.85rem);
+  margin: 4px 0 10px;
+}
+
+.review-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.review-btn {
+  padding: 7px 14px;
+  border-radius: var(--radius, 12px);
+  border: 1px solid var(--border);
+  background: var(--bg-button);
+  cursor: pointer;
+  font-size: 0.88em;
+}
+
+.review-btn:hover:not(:disabled) { background: var(--bg-button-hover); }
+.review-btn:disabled { opacity: 0.5; cursor: default; }
+.review-btn.confirmed { border-color: var(--success); color: var(--success); }
+.review-btn.false_positive { border-color: var(--danger); color: var(--danger); }
+
+.review-done { color: var(--success); font-size: var(--text-sm, 0.85rem); }
+.review-error { color: var(--danger); font-size: var(--text-sm, 0.85rem); }
+
+@media (max-width: 700px) {
+  .review-card { flex-direction: column; }
+  .review-card-media { width: 100%; }
+}
+
+/* ============================================================
+   Phase 3: Birds detail, Timeline / Day Replay, Review triage
+   ============================================================ */
+
+/* ===== Birds detail ===== */
+.bird-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+  text-align: left;
+}
+
+.bird-header {
+  display: flex;
+  gap: var(--space-4, 16px);
+  flex-wrap: wrap;
+}
+
+.bird-photo {
+  width: 190px;
+  height: 190px;
+  flex-shrink: 0;
+  border-radius: var(--radius, 12px);
+  overflow: hidden;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bird-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bird-head-body {
+  flex: 1;
+  min-width: 240px;
+}
+
+.bird-head-body h2 {
+  margin: 0 0 2px;
+  font-size: var(--text-2xl, 1.8rem);
+  color: var(--text-heading);
+}
+
+.bird-badges { margin-top: 8px; }
+
+.bird-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bird-actions .active-pref {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.bird-notify-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9em;
+  color: var(--text-secondary);
+}
+
+.bird-notify-mode select {
+  cursor: pointer;
+}
+
+.bird-action-result { margin-top: 8px; min-height: 1.2em; }
+
+.bird-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-content: start;
+  min-width: 220px;
+}
+
+.bird-stat {
+  background: var(--bg-secondary);
+  border-radius: var(--radius, 12px);
+  padding: 10px 14px;
+  text-align: center;
+}
+
+.bird-stat-value {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--text-heading);
+}
+
+.bird-stat-label {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary);
+}
+
+.bird-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4, 16px);
+}
+
+@media (max-width: 860px) {
+  .bird-two-col { grid-template-columns: 1fr; }
+  .bird-photo { width: 100%; height: 170px; }
+}
+
+/* Calendar heatmap (GitHub-style year grid) */
+.bird-calendar-wrap { overflow-x: auto; }
+
+.bird-calendar { position: relative; padding-top: 18px; min-width: 700px; }
+
+.cal-months { position: relative; height: 0; }
+
+.cal-months span {
+  position: absolute;
+  top: -18px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.cal-grid { display: flex; gap: 2px; }
+
+.cal-week { display: flex; flex-direction: column; gap: 2px; }
+
+.cal-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--bg-secondary);
+  display: block;
+}
+
+.cal-cell.l1 { background: #c7d2fe; }
+.cal-cell.l2 { background: #818cf8; }
+.cal-cell.l3 { background: #4f46e5; }
+.cal-cell.l4 { background: #312e81; }
+[data-theme="dark"] .cal-cell.l1 { background: #3730a3; }
+[data-theme="dark"] .cal-cell.l2 { background: #4f46e5; }
+[data-theme="dark"] .cal-cell.l3 { background: #818cf8; }
+[data-theme="dark"] .cal-cell.l4 { background: #c7d2fe; }
+
+.cal-cell:hover { outline: 1px solid var(--accent); }
+
+.bird-spark { height: 64px; }
+
+.bird-best-spec {
+  width: 100%;
+  border-radius: var(--radius, 12px);
+  background: var(--bg-secondary);
+  margin-bottom: 6px;
+}
+
+.bird-best-meta {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: var(--text-sm, 0.85rem);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.crowned-tag { color: var(--warning, #f59e0b); font-weight: 700; }
+
+.bird-visit-list, .bird-notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.bird-visit-item audio { width: 100%; height: 30px; }
+
+.bird-visit-meta, .bird-note-meta {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary);
+}
+
+.bird-note {
+  background: var(--bg-secondary);
+  border-radius: var(--radius, 12px);
+  padding: 8px 12px;
+}
+
+.bird-note-body { display: block; color: var(--text-primary); }
+
+.note-del {
+  border: none;
+  background: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 1em;
+  padding: 0 4px;
+}
+
+.bird-note-add { display: flex; gap: 8px; margin-bottom: 12px; }
+
+.bird-note-add textarea {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 12px);
+  padding: 8px 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  resize: vertical;
+}
+
+/* ===== Timeline / Day Replay ===== */
+.timeline-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.timeline-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-heading);
+}
+
+.timeline-datenav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeline-datenav input[type="date"] {
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 12px);
+  padding: 7px 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.timeline-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 220px));
+  gap: var(--space-3, 12px);
+}
+
+.tl-scroll { overflow-x: auto; }
+
+.tl-inner { min-width: 860px; }
+
+.tl-weather, .tl-hours, .tl-lane {
+  display: flex;
+  align-items: center;
+}
+
+.tl-label {
+  width: 200px;
+  flex-shrink: 0;
+  padding-right: 10px;
+  font-size: var(--text-sm, 0.85rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  /* left-aligned so the thumbnails form a uniform column */
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+a.tl-label:hover { color: var(--accent); font-weight: 600; }
+
+.tl-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+}
+
+.tl-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* the name truncates; the thumbnail and count never do */
+.tl-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tl-lane-count {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.85em;
+  flex-shrink: 0;
+}
+
+.tl-track {
+  flex: 1;
+  position: relative;
+  display: flex;
+  min-height: 22px;
+}
+
+.tl-weather .tl-track, .tl-hours .tl-track { min-height: 0; }
+
+.tl-wcell, .tl-hcell {
+  flex: 1;
+  text-align: center;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.tl-hours { border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px; }
+
+.tl-lane { padding: 3px 0; border-bottom: 1px solid var(--border-light); }
+.tl-lane:last-child { border-bottom: none; }
+
+.tl-grid {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-light);
+}
+
+.tl-block {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  min-width: 5px;
+  border: none;
+  border-radius: 3px;
+  background: var(--accent);
+  opacity: 0.8;
+  cursor: pointer;
+  padding: 0;
+}
+
+.tl-block:hover { opacity: 1; outline: 2px solid var(--accent); }
+
+.tl-block.playing {
+  background: var(--success, #10b981);
+  opacity: 1;
+}
+
+.tl-player {
+  margin-top: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+.tl-player-meta {
+  font-size: var(--text-sm, 0.85rem);
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 6px;
+}
+
+/* ===== Review triage (v2) ===== */
+.review-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.review-progress {
+  font-size: var(--text-sm, 0.85rem);
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.review-keys {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-muted);
+}
+
+.review-keys kbd, .review-btn kbd {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+  font-family: inherit;
+}
+
+.review-card.active {
+  outline: 2px solid var(--accent);
+}
+
+.review-card-title a { color: var(--text-heading); }
+.review-card-title a:hover { color: var(--accent); }
+
+.review-examples-label {
+  margin-top: 10px;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.review-examples-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.review-example {
+  margin: 0;
+  width: 150px;
+}
+
+.review-example img {
+  width: 100%;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+}
+
+.review-example figcaption {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.review-example audio {
+  width: 100%;
+  height: 26px;
+}
+
+/* Reassign modal */
+.reassign-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.reassign-box {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reassign-box input, .reassign-box select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 12px);
+  padding: 8px 10px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.reassign-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.reassign-go {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Species gallery: details pill */
+.bird-detail-pill {
+  background: var(--accent-subtle, rgba(79, 70, 229, 0.08));
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+
+/* ===== Year in Birds ===== */
+.year-page {
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.year-kpis {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.year-champions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4, 16px);
+}
+
+.year-champ {
+  border-left: 4px solid var(--accent);
+}
+
+.year-champ-title {
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.year-champ-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-heading);
+  margin: 4px 0 2px;
+}
+
+.year-champ-detail {
+  color: var(--text-secondary);
+  font-size: var(--text-sm, 0.85rem);
+}
+
+.year-months {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.year-month {
+  flex: 1;
+  text-align: center;
+}
+
+.year-month-bar-wrap {
+  height: 110px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.year-month-bar {
+  width: 100%;
+  background: var(--accent);
+  opacity: 0.8;
+  border-radius: 4px 4px 0 0;
+}
+
+.year-month-label {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ===== First-run setup checklist (Now page) ===== */
+.setup-checklist {
+  border-left: 4px solid var(--warning, #f59e0b);
+}
+
+.setup-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setup-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.setup-check {
+  width: 20px;
+  text-align: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.setup-list li.done .setup-check { color: var(--success, #10b981); }
+.setup-list li.todo .setup-check { color: var(--text-muted); }
+
+.setup-list li.done .setup-label {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.setup-body { display: flex; flex-direction: column; }
+
+.setup-label { font-weight: 600; }
+
+.setup-why {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--text-secondary);
+}
+
+/* ===== Plain-English takeaways (Insights) ===== */
+.takeaways-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.takeaways-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 8px;
+}
+
+.takeaways-title .nav-icon {
+  color: var(--accent);
+}
+
+.takeaways-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.takeaways-list li {
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.takeaways-list li::before {
+  content: "\2022";
+  color: var(--accent);
+  margin-right: 8px;
+}
